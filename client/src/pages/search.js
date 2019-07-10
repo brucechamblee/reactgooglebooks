@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -10,7 +10,7 @@ import API from "../utils/API";
 import Header from "../components/Header";
 import BookList from "../components/BookList";
 
-class SearchPage extends React.Component {
+class SearchPage extends Component {
   constructor(props) {
     super(props);
 
@@ -29,8 +29,10 @@ class SearchPage extends React.Component {
   }
 
   searchBooks(query) {
+    console.log(query)
     API.searchBooks(query)
       .then(res => {
+        console.log(res)
         const bookList = res.data.map(b => {
           return {
             googleId: b.id,
@@ -55,7 +57,7 @@ class SearchPage extends React.Component {
     } else {
       event.preventDefault();
       this.setState({ validated: true });
-      this.searchBooks(this.statequery);
+      this.searchBooks(this.state.query);
     }
   }
 

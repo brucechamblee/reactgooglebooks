@@ -8,14 +8,14 @@ const ajax = axios.create({
 });
 
 module.exports = {
-  findAll: function(req, res) {
+  findAll: async function(req, res) {
     const { query: params } = req;
-    
-      ajax.get(
+    try {
+      const results = await ajax.get(
         'https://www.googleapis.com/books/v1/volumes',
         { params }
-      ).then(function(results){
-
+      );
+        
       const apiBooks = results.data.items.filter(
         (result) =>
           result.volumeInfo.title &&
@@ -26,16 +26,15 @@ module.exports = {
           result.volumeInfo.imageLinks.thumbnail
       );
 
-      const dbBooks = db.Book.find({}, function(dbBooks){
-        const books = apiBooks.filter((apiBooks) =>
-          dbBooks.every((dbBook) => dbBook.googleId.toString() !== apiBooks.id)
-          );
-          return res.json(books);
+      const dbBooks = await db.Book.find();
 
-      });
+      const books = apiBooks.filter((apiBooks) =>
+        dbBooks.every((dbBook) => dbBook.googleId.toString() !== apiBooks.id)
+      );
 
-
-    
-      })
-  }
+      return res.json(books);
+    } catch (e) {
+      return res.status(422).json(e);
+    }
+  },
 };
